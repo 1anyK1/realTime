@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 199309L
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,14 +5,12 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-static volatile sig_atomic_t counter = 0;
-static volatile sig_atomic_t mess = 0;
+static volatile unsigned counter = 0;
 
 static void on_alarm(int signo) {
   (void)signo;
   if (++counter == 100) {
     counter = 0;
-    mess++;
     write(STDOUT_FILENO, "100 events\n", 11);
   }
 }
@@ -36,8 +33,9 @@ int main(void) {
   }
 
   // Ждём 10 сообщений по 100 событий => 1000 тиков ~ 10 секунд
-  while(mess < 10){
-    pause;
+  for (int i = 0; i < 100; ++i) {
+    pause(); // просыпаемся по любому сигналу
+    // on_alarm пишет каждые 100 тиков, так что здесь просто ждём времени
   }
 
   // Остановим таймер

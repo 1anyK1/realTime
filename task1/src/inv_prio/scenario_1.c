@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   const int prio_t2 = 30;
 
   // Мьютекс без наследования приоритета — демонстрация инверсии
-  if (init_resource_mutex(0) != 0) {
+  if (init_resource_mutex(1) != 0) {
     perror("init_resource_mutex");
     return EXIT_FAILURE;
   }

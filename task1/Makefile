@@ -1,7 +1,7 @@
 # Makefile for tasks/task1
 
 CC      ?= cc
-CFLAGS  ?= -Wall -Wextra -O2 -pthread
+CFLAGS  ?= -Wall -Wextra -O2 -pthread -g
 LDFLAGS ?=
 LDLIBS  ?=
 

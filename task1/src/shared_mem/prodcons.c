@@ -13,7 +13,6 @@
 
 // mutex и условная переменная
 
-
 pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t      cond  = PTHREAD_COND_INITIALIZER;
 volatile int        state = 0;    // переменная состояния
@@ -26,11 +25,9 @@ char    *progname = "prodcons";
 
 int main ()
 {
-  pthread_t t_consumer;
-  pthread_t t_producer;
   setvbuf (stdout, NULL, _IOLBF, 0);
-  pthread_create (&t_consumer, NULL, consumer, NULL);
-  pthread_create (&t_producer, NULL, producer, NULL);
+  pthread_create (NULL, NULL, consumer, NULL);
+  pthread_create (NULL, NULL, producer, NULL);
   sleep (20);     // Позволим потокам выполнить "работу"
   printf ("%s:  main, exiting\n", progname);
   return 0;

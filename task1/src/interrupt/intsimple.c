@@ -1,5 +1,5 @@
 //  Демонстрация обработки "прерываний" на Linux: сигналы и ввод с клавиатуры.
-#define _POSIX_C_SOURCE 199309L
+
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -16,7 +16,6 @@ static volatile sig_atomic_t got_sigint = 0;
 static volatile sig_atomic_t got_sigterm = 0;
 static volatile sig_atomic_t got_sigusr1 = 0;
 static volatile sig_atomic_t got_sigusr2 = 0;
-static volatile sig_atomic_t got_sigbus = 0;
 
 static struct termios orig_termios;
 
@@ -39,12 +38,11 @@ static void handle_sigint(int signo) { (void)signo; got_sigint = 1; }
 static void handle_sigterm(int signo) { (void)signo; got_sigterm = 1; }
 static void handle_sigusr1(int signo) { (void)signo; got_sigusr1 = 1; }
 static void handle_sigusr2(int signo) { (void)signo; got_sigusr2 = 1; }
-static void handle_sigbus(int signo) { (void)signo; got_sigbus = 1; }
 
 int main(void) {
   setvbuf(stdout, NULL, _IOLBF, 0);
   printf("%s: starting...\n", progname);
-  printf("Поддерживаемые сигналы: SIGINT(Ctrl+C), SIGTERM, SIGUSR1, SIGUSR2, SIGBUS.\n");
+  printf("Поддерживаемые сигналы: SIGINT(Ctrl+C), SIGTERM, SIGUSR1, SIGUSR2.\n");
   printf("Замечание: SIGKILL нельзя перехватить или обработать на Linux.\n");
   printf("Нажмите 'q' для выхода.\n");
 
@@ -54,13 +52,11 @@ int main(void) {
   }
 
   struct sigaction sa = {0};
-  sigemptyset(&sa.sa_mask); 
-  sa.sa_flags = 0;
-  sa.sa_handler = handle_sigint; sigaction(SIGINT, &sa, NULL);
+  sa.sa_handler = handle_sigint; sigemptyset(&sa.sa_mask); sa.sa_flags = 0;
+  sigaction(SIGINT, &sa, NULL);
   sa.sa_handler = handle_sigterm; sigaction(SIGTERM, &sa, NULL);
   sa.sa_handler = handle_sigusr1; sigaction(SIGUSR1, &sa, NULL);
   sa.sa_handler = handle_sigusr2; sigaction(SIGUSR2, &sa, NULL);
-  sa.sa_handler = handle_sigbus; sigaction(SIGBUS, &sa, NULL);
 
   // Основной цикл: опрашиваем stdin и проверяем флаги сигналов
   for (;;) {
@@ -69,7 +65,6 @@ int main(void) {
     if (got_sigterm) { got_sigterm = 0; printf("%s: получен SIGTERM\n", progname); }
     if (got_sigusr1) { got_sigusr1 = 0; printf("%s: получен SIGUSR1\n", progname); }
     if (got_sigusr2) { got_sigusr2 = 0; printf("%s: получен SIGUSR2\n", progname); }
-    if (got_sigbus) { got_sigbus = 0; printf("%s: получен SIGBUS\n", progname); }
 
     // Неблокирующее чтение клавиатуры
     char ch;
